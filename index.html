@@ -729,6 +729,7 @@
   var ytIdx = 0;
   var soundBtn = document.getElementById("sound");
   var soundOn = false, songReached = false, ytReady = false, pendingPlay = false, ytPlayer = null;
+  var primed = false, pendingPrime = false, songStarted = false;
   var enterEl = document.getElementById("enter");
 
   (function(){ var s = document.createElement("script"); s.src = "https://www.youtube.com/iframe_api"; document.head.appendChild(s); })();
@@ -737,19 +738,42 @@
       videoId: YT_IDS[0],
       playerVars: { autoplay: 0, controls: 0, playsinline: 1, rel: 0, modestbranding: 1 },
       events: {
-        onReady: function(){ ytReady = true; if(pendingPlay) startSong(); },
+        onReady: function(){ ytReady = true; if(pendingPrime) primeSong(); if(pendingPlay) startSong(); },
         onError: function(){ ytIdx++; if(ytIdx < YT_IDS.length && ytPlayer){
-          try { ytPlayer.loadVideoById(YT_IDS[ytIdx]); ytPlayer.unMute(); ytPlayer.playVideo(); } catch(e){} } }
+          try {
+            ytPlayer.loadVideoById(YT_IDS[ytIdx]);
+            if(songStarted){ ytPlayer.unMute(); ytPlayer.setVolume(65); } else { ytPlayer.mute(); }
+            ytPlayer.playVideo();
+          } catch(e){} } }
       }
     });
   };
-  function startSong(){ if(!ytPlayer || !ytReady){ pendingPlay = true; return; }
-    try { ytPlayer.unMute(); ytPlayer.setVolume(65); ytPlayer.playVideo(); } catch(e){} }
+  // "ปลุก" player ด้วยการเล่นแบบเงียบไว้ก่อน (มักทำในจังหวะที่ผู้ใช้แตะ) เพื่อให้ unmute ตอน scroll ได้
+  function primeSong(){
+    if(primed || !ytPlayer || !ytReady) return;
+    try { ytPlayer.mute(); ytPlayer.playVideo(); primed = true; } catch(e){}
+  }
+  // เผื่อกรณี player ยังไม่พร้อมตอนกดเข้า — ปลุกให้ทันในสัมผัส/เลื่อนครั้งถัดไป (สำคัญบน iPhone)
+  function armGesturePrime(){
+    function onceGesture(){ primeSong(); if(primed){
+      window.removeEventListener("touchend", onceGesture); window.removeEventListener("pointerdown", onceGesture); } }
+    window.addEventListener("touchend", onceGesture, { passive: true });
+    window.addEventListener("pointerdown", onceGesture, { passive: true });
+  }
+  function startSong(){
+    if(!ytPlayer || !ytReady){ pendingPlay = true; return; }
+    try {
+      songStarted = true; primed = true;
+      ytPlayer.seekTo(0, true); ytPlayer.unMute(); ytPlayer.setVolume(65); ytPlayer.playVideo();
+    } catch(e){}
+  }
   function stopSong(){ if(ytPlayer && ytReady){ try { ytPlayer.pauseVideo(); } catch(e){} } }
-  function tryPlaySong(){ songReached = true; if(soundOn) startSong(); }
+  // เลื่อนถึงจุดที่กำหนด (section#propose) → เล่นเพลงเองครั้งเดียว
+  function tryPlaySong(){ songReached = true; if(soundOn && !songStarted) startSong(); }
 
   document.getElementById("enterBtn").addEventListener("click", function(){
     soundOn = true; soundBtn.textContent = "🔊";
+    primeSong(); if(!primed){ pendingPrime = true; } armGesturePrime();
     enterEl.classList.add("gone"); document.body.classList.remove("locked"); buzz(15);
     setTimeout(function(){ enterEl.style.display = "none"; buildThread(); }, 1100);
   });

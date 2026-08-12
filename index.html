@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>ถึงเธอ</title>
+<meta name="description" content="เรื่องเล่าของเราสองคน ตั้งแต่วันแรกที่เจอกัน" />
+<meta name="theme-color" content="#FAF6F0" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Trirong:wght@300;400;500&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #FAF6F0;
+    --ink: #3D3430;
+    --ink-soft: #6b5f57;
+    --accent: #E8A598;
+    --accent-deep: #D98A76;
+    --thread: #c96a5a;
+    --gold: #E9C79B;
+    --maxw: 620px;
+    --serif: "Trirong", Georgia, serif;
+    --sans: "Sarabun", system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--sans); font-weight: 300; line-height: 1.9; font-size: 1.06rem;
+    -webkit-font-smoothing: antialiased; transition: background 1.4s ease; overflow-x: hidden;
+  }
+  body.locked { overflow: hidden; height: 100vh; }
+
+  /* ---------- red thread of fate ---------- */
+  #thread { position: absolute; top: 0; left: 0; z-index: 0; pointer-events: none; }
+  #threadPath { fill: none; stroke: var(--thread); stroke-width: 1.6; opacity: .38; stroke-linecap: round;
+    transition: stroke-dashoffset .12s linear; }
+  .bead { fill: var(--thread); opacity: 0; transition: opacity .7s ease; }
+  .bead.lit { opacity: .7; }
+  #knot { fill: none; stroke: var(--accent-deep); stroke-width: 2; opacity: 0; transition: opacity 1s ease; }
+  #knot.lit { opacity: .8; }
+
+  /* ---------- layout ---------- */
+  section { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; padding: 14vh 26px; position: relative; z-index: 1; }
+  .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; }
+  .eyebrow { font-family: var(--sans); font-weight: 400; letter-spacing: .28em; text-transform: uppercase;
+    font-size: .72rem; color: var(--accent-deep); margin: 0 0 22px; }
+  h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(1.7rem, 6vw, 2.5rem);
+    line-height: 1.35; margin: 0 0 26px; color: var(--ink); }
+  p { margin: 0 0 18px; color: var(--ink-soft); }
+  .key { font-family: var(--serif); font-size: clamp(1.4rem, 5vw, 1.95rem); color: var(--accent-deep);
+    line-height: 1.5; margin: 30px 0; text-align: center; font-weight: 400; }
+
+  /* ---------- photo slot (warm, cohesive) ---------- */
+  figure { margin: 0 0 34px; width: 100%; aspect-ratio: 4 / 3; border-radius: 18px; overflow: hidden;
+    background: linear-gradient(135deg, #efe6dc, #f5ded4); display: flex; align-items: center;
+    justify-content: center; box-shadow: 0 18px 50px -28px rgba(120,80,60,.5); position: relative; }
+  figure img { width: 100%; height: 100%; object-fit: cover; display: block;
+    filter: saturate(1.03) sepia(.06) contrast(1.02) brightness(1.02); }
+  figure::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,240,225,.06), rgba(217,138,118,.10)); mix-blend-mode: multiply; opacity: 0; }
+  figure.has-img::after { opacity: 1; }
+  figure .ph { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 8px; color: var(--accent-deep); font-size: .82rem; letter-spacing: .04em; pointer-events: none; }
+  figure.has-img .ph { display: none; }
+
+  /* ---------- memory stamp (ตราประจำที่) ---------- */
+  .stamp { width: 62px; height: 62px; border: 1.5px dashed var(--accent-deep); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--accent-deep);
+    transform: rotate(-5deg); opacity: .92; }
+  .stamp svg { width: 30px; height: 30px; }
+  section[data-dark] .stamp { border-color: #E8A598; color: #E8A598; }
+  #finale .stamp, #thanks .stamp { transform: rotate(0); }
+  .wife-reveal { font-family: var(--serif); font-size: 1.08rem; color: var(--accent-deep); margin: 18px 0 4px;
+    opacity: 0; transform: translateY(8px); transition: opacity 1s ease, transform 1s ease; }
+  .wife-reveal.show { opacity: 1; transform: none; }
+  .wife-reveal b { color: var(--ink); font-weight: 500; }
+
+  /* ---------- reveal ---------- */
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity 1.1s ease, transform 1.1s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  .reveal.d1 { transition-delay: .12s; } .reveal.d2 { transition-delay: .26s; } .reveal.d3 { transition-delay: .4s; }
+
+  /* ---------- scroll hint ---------- */
+  .hint { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); color: var(--accent-deep);
+    font-size: .74rem; letter-spacing: .2em; text-transform: uppercase; display: flex; flex-direction: column;
+    align-items: center; gap: 8px; opacity: .8; }
+  .hint span { animation: bob 1.8s ease-in-out infinite; }
+  @keyframes bob { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(6px);} }
+
+  /* ---------- INTRO ---------- */
+  #intro { text-align: center; }
+  #stage { position: relative; width: 100%; height: 46vh; margin: 6px 0 8px; touch-action: none; }
+  .dot { position: absolute; top: 50%; width: 26px; height: 26px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff, var(--accent)); box-shadow: 0 0 24px 6px rgba(232,165,152,.6);
+    transform: translate(-50%, -50%); cursor: grab; touch-action: none; transition: box-shadow .4s ease; }
+  .dot:active { cursor: grabbing; }
+  .dot.a { left: 22%; } .dot.b { left: 78%; }
+  #stage.merged .dot { box-shadow: 0 0 60px 22px rgba(232,165,152,.85); }
+  .merge-flash { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; border-radius: 50%;
+    transform: translate(-50%,-50%) scale(0); background: #fff; opacity: 0; pointer-events: none;
+    box-shadow: 0 0 80px 40px rgba(255,235,225,.9); }
+  #stage.merged .merge-flash { animation: bloom 1.4s ease forwards; }
+  @keyframes bloom { 0%{ transform: translate(-50%,-50%) scale(0); opacity: .9;} 100%{ transform: translate(-50%,-50%) scale(9); opacity: 0;} }
+  .prompt { color: var(--ink-soft); font-size: .95rem; margin-top: 4px; }
+
+  /* ---------- PEAK ---------- */
+  #peak .play { position: relative; width: 100%; height: 44vh; margin: 8px 0 20px; display: flex;
+    align-items: flex-end; justify-content: center; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .pot { position: absolute; bottom: 6%; left: 50%; transform: translateX(-50%); width: 190px; height: 120px;
+    border-radius: 0 0 90px 90px / 0 0 70px 70px;
+    background: radial-gradient(ellipse at 50% 0, #e9d3b8 0 40%, #c99b6e 41%, #a9764a 100%);
+    box-shadow: inset 0 8px 20px rgba(255,255,255,.4), 0 14px 30px -14px rgba(90,60,40,.6);
+    display: flex; align-items: flex-start; justify-content: center; }
+  .pot::before { content:""; position:absolute; top:-9px; left:-14px; right:-14px; height:22px; border-radius:50%;
+    background:#b78552; box-shadow: inset 0 4px 8px rgba(0,0,0,.15); }
+  .pork { position: absolute; top: 4%; left: 50%; transform: translateX(-50%); width: 84px; height: 54px;
+    border-radius: 40% 40% 46% 46%;
+    background: linear-gradient(160deg,#f6d9d2 0 46%, #e9a99c 47% 62%, #f4d3cb 63%);
+    box-shadow: 0 8px 18px -8px rgba(120,70,60,.6); cursor: grab; touch-action: none; }
+  .pork::after{ content:""; position:absolute; inset:32% 12% auto; height:5px; border-radius:5px; background:rgba(255,255,255,.55); }
+  .pork:active { cursor: grabbing; }
+  .blush { position: fixed; inset: 0; pointer-events: none; opacity: 0; transition: opacity 1.2s ease; z-index: 4; }
+  .blush.on { opacity: 1; background: radial-gradient(circle at 50% 60%, rgba(240,170,155,.28), rgba(240,170,155,.06) 60%, rgba(240,170,155,0)); }
+  .heart { position: fixed; bottom: -30px; font-size: 20px; pointer-events: none; z-index: 5; opacity: 0; }
+
+  /* ---------- FATE ---------- */
+  .fate-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 8px 0 6px; }
+  .chip { border: 1px solid #e6d3c8; background: #fff8f3; border-radius: 14px; padding: 16px 14px; text-align: center;
+    font-size: .95rem; color: var(--ink); cursor: pointer; transition: transform .3s ease, background .3s ease, border-color .3s ease; }
+  .chip.matched { background: #f7e4dc; border-color: var(--accent); color: var(--accent-deep); transform: scale(1.02); cursor: default; }
+  .chip.matched::after { content:" ✦"; }
+
+  .lyric { font-family: var(--serif); text-align: center; color: var(--accent-deep); font-size: 1.15rem; }
+
+  #thanks .wrap, #thanks h2 { text-align: center; }
+
+  /* ---------- FINALE ---------- */
+  #finale { text-align: center; }
+  .cert { width: 100%; max-width: 560px; margin: 8px auto 0; padding: 34px 24px 26px; background: #fffdf8;
+    border: 1px solid #ecdcc7; border-radius: 20px; box-shadow: 0 24px 60px -34px rgba(120,90,50,.55); }
+  .cert h2 { font-size: clamp(1.9rem, 7vw, 2.7rem); margin-bottom: 14px; }
+  .sign-wrap { margin: 18px 0 6px; }
+  .sign-label { font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-deep); margin-bottom: 8px; }
+  .sign-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .sign-col { display: flex; flex-direction: column; }
+  .sign-name { font-size: .8rem; color: var(--accent-deep); text-align: center; margin: 6px 0 0; }
+  canvas.pad { width: 100%; height: 120px; background: #fbf4ea; border-bottom: 2px solid var(--accent-deep);
+    border-radius: 10px 10px 0 0; touch-action: none; user-select: none; -webkit-user-select: none; cursor: crosshair; display: block; }
+  #ytHost { position: fixed; left: -9999px; bottom: 0; width: 200px; height: 120px; opacity: 0; pointer-events: none; }
+  #playSong { margin-top: 6px; animation: bob 2s ease-in-out infinite; }
+  .sign-actions { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+  button.btn { font-family: var(--sans); font-size: .95rem; font-weight: 400; letter-spacing: .02em; padding: 12px 24px;
+    border-radius: 999px; border: 1px solid var(--accent-deep); background: var(--accent-deep); color: #fff;
+    cursor: pointer; transition: opacity .3s, transform .2s; }
+  button.btn.ghost { background: transparent; color: var(--accent-deep); }
+  button.btn:disabled { opacity: .4; cursor: not-allowed; }
+  button.btn:active { transform: scale(.97); }
+  .done-msg { font-family: var(--serif); font-size: 1.4rem; color: var(--accent-deep); margin-top: 20px; opacity: 0; transition: opacity 1s ease; }
+  .done-msg.show { opacity: 1; }
+  #dlWrap { margin-top: 16px; opacity: 0; height: 0; overflow: hidden; transition: opacity .8s ease; }
+  #dlWrap.show { opacity: 1; height: auto; }
+  .petal { position: fixed; top: -20px; font-size: 18px; pointer-events: none; z-index: 6; }
+
+  /* ---------- threshold / enter ---------- */
+  #enter { position: fixed; inset: 0; z-index: 50; background: radial-gradient(circle at 50% 40%, #362d28, #211b18);
+    color: #f3e7dd; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+    text-align: center; padding: 30px; transition: opacity 1.1s ease; }
+  #enter.gone { opacity: 0; pointer-events: none; }
+  #enter .to { letter-spacing: .35em; text-transform: uppercase; font-size: .78rem; color: var(--accent); opacity: .85; }
+  #enter .name { font-family: var(--serif); font-size: clamp(2.4rem, 12vw, 4rem); font-weight: 300; }
+  #enter .sub { color: #d8c6ba; font-size: .92rem; max-width: 320px; line-height: 1.7; }
+  #enterBtn { margin-top: 8px; font-family: var(--sans); font-size: 1rem; padding: 14px 34px; border-radius: 999px;
+    border: 1px solid var(--accent); background: transparent; color: #f3e7dd; cursor: pointer; letter-spacing: .04em;
+    transition: background .4s ease, color .4s ease; }
+  #enterBtn:hover { background: var(--accent); color: #2a221e; }
+  #enter .heartbeat { width: 12px; height: 12px; border-radius: 50%; background: var(--accent);
+    box-shadow: 0 0 22px 6px rgba(232,165,152,.6); animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{ transform: scale(1); opacity: .8;} 50%{ transform: scale(1.5); opacity: 1;} }
+
+  #sound { position: fixed; top: 16px; right: 16px; z-index: 20; width: 42px; height: 42px; border-radius: 50%;
+    border: 1px solid #e6d3c8; background: rgba(255,255,255,.8); backdrop-filter: blur(6px); color: var(--accent-deep);
+    font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 18px -8px rgba(120,90,60,.5); }
+  #bar { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 20; transition: width .15s linear; }
+
+  /* ---------- place card (ร้าน + แผนที่) ---------- */
+  .place { position: relative; margin: 6px 0 30px; background: #fffdf8; border: 1px solid #ecdcc7;
+    border-radius: 20px; padding: 14px 14px 16px; box-shadow: 0 20px 50px -30px rgba(120,90,50,.5); }
+  .place::before { content: ""; position: absolute; top: -9px; left: 50%; width: 92px; height: 22px;
+    transform: translateX(-50%) rotate(-3deg); background: rgba(233,199,155,.55); border-radius: 3px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.06); }
+  .place-photo { position: relative; width: 100%; aspect-ratio: 16 / 10; border-radius: 14px; overflow: hidden;
+    background: linear-gradient(135deg, #f3e7db, #f6ddd2); display: flex; align-items: center; justify-content: center; }
+  .place-photo img { width: 100%; height: 100%; object-fit: cover; display: block;
+    filter: saturate(1.03) sepia(.05) contrast(1.02) brightness(1.02); }
+  .place-photo .ph { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 6px;
+    align-items: center; justify-content: center; color: var(--accent-deep); text-align: center; padding: 12px; }
+  .place-photo .ph .em { font-size: 40px; line-height: 1; }
+  .place-photo .ph .nm { font-family: var(--serif); font-size: 1.2rem; }
+  .place-photo .ph .hintp { font-size: .72rem; opacity: .7; letter-spacing: .02em; }
+  .place-photo.has-img .ph { display: none; }
+  .place-map { margin-top: 12px; border-radius: 14px; overflow: hidden; height: 200px; background: #efe6dc; position: relative; }
+  .place-map iframe { width: 100%; height: 100%; border: 0; display: block; }
+  .place-map .maploading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: var(--accent-deep); font-size: .82rem; }
+  .place-bar { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 0 4px; }
+  .place-bar .p-name { font-family: var(--serif); font-size: 1.12rem; color: var(--ink); }
+  .place-bar .p-tag { margin-left: auto; font-size: .74rem; color: var(--accent-deep); background: #f7e4dc;
+    padding: 4px 11px; border-radius: 999px; white-space: nowrap; }
+  .place-link { display: inline-block; margin: 8px 4px 0; font-size: .8rem; color: var(--accent-deep);
+    text-decoration: none; border-bottom: 1px dashed var(--accent); }
+
+  /* ---------- photo pile (กอง ๆ รูปบนโต๊ะ) ---------- */
+  .pilewrap { margin: 8px 0 22px; }
+  .pile { position: relative; width: 100%; height: 62vh; max-height: 500px; margin: 0 auto; touch-action: pan-y; }
+  .pile.sm { height: 46vh; max-height: 380px; }
+  .pile-hint { text-align: center; font-size: .76rem; color: var(--accent-deep); letter-spacing: .03em;
+    margin-top: 4px; opacity: .85; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .polaroid { position: absolute; top: 50%; left: 50%; width: min(62%, 240px);
+    background: #fffdf8; padding: 10px 10px 32px; border-radius: 5px;
+    box-shadow: 0 16px 34px -16px rgba(90,60,40,.55), 0 2px 6px rgba(0,0,0,.06);
+    cursor: grab; will-change: transform; touch-action: none; user-select: none; -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent; transition: box-shadow .25s ease; }
+  .polaroid:active { cursor: grabbing; box-shadow: 0 22px 44px -14px rgba(90,60,40,.6); }
+  .polaroid img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block; border-radius: 3px;
+    background: #eee4d9; pointer-events: none; filter: saturate(1.03) sepia(.05) brightness(1.02); }
+  .polaroid.land img { aspect-ratio: 4 / 3; }
+  .polaroid .cap { position: absolute; left: 0; right: 0; bottom: 8px; text-align: center;
+    font-family: var(--serif); font-size: .82rem; color: var(--ink-soft); }
+
+  /* ---------- lightbox (ดับเบิลคลิกขยาย) ---------- */
+  #lightbox { position: fixed; inset: 0; z-index: 60; background: rgba(30,22,18,.93); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; padding: 24px; }
+  #lightbox.on { display: flex; }
+  .lb-frame { background: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 30px 80px -20px rgba(0,0,0,.6); }
+  .lb-frame img { display: block; max-width: 92vw; max-height: 76vh; border-radius: 4px; }
+  .lb-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.4); background: rgba(255,255,255,.12); color: #fff; font-size: 22px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .lb-prev { left: 14px; } .lb-next { right: 14px; }
+  .lb-close { position: absolute; top: 16px; right: 18px; width: 44px; height: 44px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.4); background: rgba(255,255,255,.12); color: #fff; font-size: 20px; cursor: pointer; }
+  .lb-count { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: #f3e7dd;
+    font-size: .8rem; letter-spacing: .14em; }
+
+  .propose-line { font-family: var(--serif); text-align: center; color: var(--accent-deep);
+    font-size: clamp(1.3rem, 5vw, 1.7rem); line-height: 1.5; margin: 4px 0 6px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; scroll-behavior: auto; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+    #threadPath { transition: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body class="locked">
+
+<!-- ===== THRESHOLD ===== -->
+<div id="enter">
+  <div class="heartbeat" aria-hidden="true"></div>
+  <p class="to">ถึง</p>
+  <p class="name" id="herName">เธอ</p>
+  <p class="sub">มีเรื่องหนึ่งที่อยากเล่าให้คุณแฟนฟัง ตั้งแต่วันแรกที่เราเจอกัน<br />เปิดเสียงไว้นะ จะได้ยินเพลงของเรา</p>
+  <button id="enterBtn" type="button">แตะเพื่อเริ่ม 🔊</button>
+</div>
+
+<svg id="thread" aria-hidden="true"><path id="threadPath" d=""></path><g id="beads"></g><circle id="knot" r="12"></circle></svg>
+
+<div id="bar" aria-hidden="true"></div>
+<button id="sound" aria-label="เปิด/ปิดเพลง" title="เปิด/ปิดเพลง">🔈</button>
+<div class="blush" id="blush" aria-hidden="true"></div>
+
+<!-- ===== INTRO ===== -->
+<section id="intro" aria-label="คนแปลกหน้าคนแรก">
+  <div class="wrap">
+    <p class="eyebrow reveal">คนแปลกหน้าคนแรก</p>
+    <h2 class="reveal d1">เหมือนโลกแอบ ๆ ดันเราสองคนมาให้เจอกัน</h2>
+    <div id="stage" role="group" aria-label="ลากแสงสองดวงมาชนกันเพื่อเริ่มเรื่อง">
+      <div class="merge-flash"></div>
+      <div class="dot a" id="dotA" tabindex="0" role="button" aria-label="แสงดวงที่หนึ่ง"></div>
+      <div class="dot b" id="dotB" tabindex="0" role="button" aria-label="แสงดวงที่สอง"></div>
+    </div>
+    <p class="prompt reveal d2" id="introPrompt">ลากแสงสองดวงมาชนกัน เพื่อเริ่มเรื่องของเรา</p>
+    <div class="story reveal" id="introStory" style="margin-top:20px; display:none;">
+      <p>ความรักครั้งนี้เกิดขึ้นจากคนแปลกหน้าที่ไม่ได้ผ่านเพื่อนของเรามาก่อน เราทั้งคู่ไม่มีใครรู้จักกันมาก่อนเลย เหมือนโลกแอบ ๆ ดันเรามาให้เจอกัน เพื่ออยากรู้อะไรบางอย่างของเราทั้งคู่</p>
+      <p class="key">โลกจับเราสองคนมาเจอกัน… เพื่ออะไรกันนะ?</p>
+    </div>
+  </div>
+  <div class="hint" aria-hidden="true"><span>เลื่อนลง</span><span>↓</span></div>
+</section>
+
+<!-- ===== โต๊ะ ===== -->
+<section aria-label="เจอกันที่โต๊ะ">
+  <div class="wrap story">
+    <p class="eyebrow reveal">เจอกันที่โต๊ะ</p>
+    <div class="pilewrap reveal d1">
+      <div class="pile sm" data-imgs="images/table/t1.jpg,images/table/t2.jpg" aria-label="รูปวันที่เจอกันที่โต๊ะ"></div>
+      <p class="pile-hint">🖐️ ลากดูรูป · ดับเบิลคลิกเพื่อขยาย</p>
+    </div>
+    <p class="reveal d2">เรามาเจอกันที่โต๊ะที่มีคนอยู่หลากหลายคน แต่ไม่รู้ทำไม เราถึงสังเกตกันเป็นพิเศษนิดหน่อย (เอาจริง ๆ เธอชอบเราก่อนก็บอกมาเถอะ) ตอนนั้นเราไม่ได้สนใจกันเท่าไหร่ เพราะว่าเราต่างมางานเสวนาที่เราทั้งคู่ต้องการความรู้ และแม้ว่า session วันนั้นเราไม่ได้อะไรมากมาย แต่จุดหนึ่งที่เราประทับใจ คือการปรับมุมมองของตัวเองเพื่อให้เรายังสามารถหาประโยชน์จากการมาที่นี่ได้จากการเข้าใจมุมมองของคนอื่น</p>
+  </div>
+</section>
+
+<!-- ===== ร้านกาแฟ ===== -->
+<section aria-label="ไปต่อกันที่ร้านกาแฟ">
+  <div class="wrap story">
+    <p class="eyebrow reveal">ไปต่อกันที่ร้านกาแฟ</p>
+    <div class="place reveal d1" data-place data-name="le café phénix" data-q="le café phénix bangkok" data-photo="images/places/cafe.jpg">
+      <div class="place-photo"><img alt="" /><div class="ph"><div class="em">☕</div><div class="nm">le café phénix</div><div class="hintp">วางรูปร้านที่ images/places/cafe.jpg</div></div></div>
+      <div class="place-map"><div class="maploading">กำลังโหลดแผนที่…</div></div>
+      <div class="place-bar"><span aria-hidden="true">📍</span><span class="p-name">le café phénix</span><span class="p-tag">ร้านกาแฟ</span></div>
+      <a class="place-link" data-maplink target="_blank" rel="noopener">↗ เปิดใน Google Maps</a>
+    </div>
+    <p class="reveal d2">แม้ว่าหากเล่าย้อนหลัง เราจะเป็นเหมือนอาหวัง (แฮะ ๆ) แต่ว่าตรงพื้นที่นั้นก็เป็นพื้นที่ที่ทำให้เรารู้จักความเป็นเธอมากขึ้น แม้ว่าจะยังไม่ได้ชอบเท่าไหร่ แต่ก็ทำให้เข้าใจว่า เธอเป็นคนหาทำ และคิดเพื่อตัวเองคนหนึ่ง เป็นคนดี ๆ ในชีวิตที่น่าคบหาและอยู่ด้วย เป็นคนที่จะพาอะไรดี ๆ เข้ามาในชีวิตของคนที่อยู่รอบข้างได้ และคนเหล่านั้น ก็คงดีใจเสมอที่มีเธออยู่ด้วย</p>
+  </div>
+</section>
+
+<!-- ===== กินข้าวครั้งแรก ===== -->
+<section aria-label="ไปกินข้าวด้วยกันครั้งแรก">
+  <div class="wrap story">
+    <p class="eyebrow reveal">ไปกินข้าวด้วยกันครั้งแรก</p>
+    <div class="place reveal d1" data-place data-name="Eat Am Are (MBK)" data-q="Eat Am Are MBK Center Bangkok" data-photo="images/places/eatamare.jpg">
+      <div class="place-photo"><img alt="" /><div class="ph"><div class="em">🍽️</div><div class="nm">Eat Am Are · MBK</div><div class="hintp">วางรูปร้านที่ images/places/eatamare.jpg</div></div></div>
+      <div class="place-map"><div class="maploading">กำลังโหลดแผนที่…</div></div>
+      <div class="place-bar"><span aria-hidden="true">📍</span><span class="p-name">Eat Am Are</span><span class="p-tag">สาขา MBK</span></div>
+      <a class="place-link" data-maplink target="_blank" rel="noopener">↗ เปิดใน Google Maps</a>
+    </div>
+    <p class="reveal d2">หลังจากที่เราทักไปหาเธอบ่อย (ไม่รู้ทำไมเหมือนกัน) เราก็ได้กินข้าวด้วยกัน เราไม่รู้ทำไมเหมือนกัน เราถึงอยากนั่งฝั่งเดียวกับเธอ (เอาจริง ๆ แล้วเราเข้าใจว่าเธอชอบเราด้วยซ้ำ แต่ก็ดูเหมือนเธอจะไม่ค่อยสนใจเราเท่าไหร่แฮะ) ตอนนั้นเราได้เห็นการทำงานของเธอ และได้เข้าใจว่า “ผู้หญิงคนนี้ไม่ธรรมดา” มากขึ้น เพราะว่าเธออยู่ในระดับของผู้บริหารได้เลยล่ะ</p>
+  </div>
+</section>
+
+<!-- ===== บรรทัดทอง ===== -->
+<section aria-label="ไปเดินเล่นด้วยกันที่บรรทัดทอง">
+  <div class="wrap story">
+    <p class="eyebrow reveal">ไปเดินเล่นด้วยกันที่บรรทัดทอง</p>
+    <div class="place reveal d1" data-place data-name="ตั้งใจจุ่ม บรรทัดทอง" data-q="ตั้งใจจุ่ม บรรทัดทอง" data-photo="images/places/banthadthong.jpg">
+      <div class="place-photo"><img alt="" /><div class="ph"><div class="em">🌆</div><div class="nm">ตั้งใจจุ่ม · บรรทัดทอง</div><div class="hintp">วางรูปที่ images/places/banthadthong.jpg</div></div></div>
+      <div class="place-map"><div class="maploading">กำลังโหลดแผนที่…</div></div>
+      <div class="place-bar"><span aria-hidden="true">📍</span><span class="p-name">ตั้งใจจุ่ม</span><span class="p-tag">บรรทัดทอง</span></div>
+      <a class="place-link" data-maplink target="_blank" rel="noopener">↗ เปิดใน Google Maps</a>
+    </div>
+    <p class="reveal d2">วันนี้เป็นวันที่ความรู้สึกหลากหลายอย่างเกิดขึ้น เราเหมือนไปเดทกันจริง ๆ ทั้ง ๆ ที่ตอนนั้นเข้าใจว่าเราจะเป็นเพื่อนกัน แต่เราทั้งคู่ ก็ดูกันอย่างกับชอบกันจริง ๆ มีแซวกันเล็ก ๆ น้อย ๆ พอให้เขินได้บ้าง กลายเป็นพื้นที่ที่ความรู้สึกที่เราไม่ได้วางแผนเอาไว้ตั้งแต่แรก ได้เกิดขึ้นมาในวันนี้ (จะบอกให้ว่าวันนั้นเธอสวยมาก ๆ เราแทบคุมตัวเองไม่ให้เขินเธอเวลาที่คุยกับเธอได้ยากนิดหน่อยเลยล่ะ)</p>
+  </div>
+</section>
+
+<!-- ===== PEAK ===== -->
+<section id="peak" aria-label="ไปกินร้านตั้งใจจุ่ม">
+  <div class="wrap">
+    <p class="eyebrow reveal">ไปกินร้านตั้งใจจุ่ม</p>
+    <h2 class="reveal d1" style="text-align:center">ตอนที่เราสังเกตว่าเธอชอบหยิบหมูคุโรบูตะ</h2>
+    <div class="play reveal d2" id="play" role="group" aria-label="ลากหมูคุโรบูตะใส่หม้อ">
+      <div class="pot" id="pot"></div>
+      <div class="pork" id="pork" tabindex="0" role="button" aria-label="หมูคุโรบูตะ — ลากใส่หม้อ"></div>
+    </div>
+    <p class="prompt reveal d2" id="peakPrompt" style="text-align:center">ลองหยิบหมูคุโรบูตะใส่หม้อสิ 🥢</p>
+    <div class="story reveal" id="peakStory" style="display:none">
+      <p>ตอนแรกลังเลใจ ว่าชอบหรือเปล่า จนได้เห็นตอนที่เธอเขิน ตอนที่เราสังเกตว่าเธอชอบหยิบหมูคุโรบูตะ จนเธอเขิน ความน่ารักมันเอ่อล้นไม่ไหว จนตอนนั้นรู้ตัวครั้งแรกว่าชอบเธอเข้าให้แล้ว เราไม่เคยเขินมากขนาดนี้ มันเขินหนักมาก ๆ และเวลาที่เห็นเธอเขิน เรายิ่งเขินเธอเข้าไปอีก กลายเป็นว่า เราเริ่มรู้สึกมากกว่านั้นด้วยกันทั้งคู่เข้าให้แล้ว</p>
+      <p class="key">แล้วเราก็รู้ตัวครั้งแรก — ว่าชอบเธอเข้าให้แล้ว</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ถ้วยถัง ===== -->
+<section aria-label="ไปร้านถ้วยถัง">
+  <div class="wrap story">
+    <p class="eyebrow reveal">ไปร้านถ้วยถัง</p>
+    <div class="place reveal d1" data-place data-name="ร้านถ้วยถัง" data-q="ร้านถ้วยถัง สุกี้" data-photo="images/places/thuaythang.jpg">
+      <div class="place-photo"><img alt="" /><div class="ph"><div class="em">🍲</div><div class="nm">ร้านถ้วยถัง</div><div class="hintp">วางรูปร้านที่ images/places/thuaythang.jpg</div></div></div>
+      <div class="place-map"><div class="maploading">กำลังโหลดแผนที่…</div></div>
+      <div class="place-bar"><span aria-hidden="true">📍</span><span class="p-name">ร้านถ้วยถัง</span><span class="p-tag">สุกี้ตั้งโต๊ะ</span></div>
+      <a class="place-link" data-maplink target="_blank" rel="noopener">↗ เปิดใน Google Maps</a>
+    </div>
+    <p class="reveal d2">ถ้าก่อนหน้านี้ เป็นการตกหลุมนิด ๆ หน่อย ๆ อันนี้ก็เป็นเหมือนการตกหลุมลงไปจริงจังเลยล่ะ เพราะว่าวิธีการคิด การมองโลก และการมองตัวเองของเราเหมือนกันมาก ๆ เลย อย่างกับเจอเนื้อคู่ เป็นหนึ่งในการสนทนาที่มีความหมายมากที่สุดในชีวิตเลยก็ว่าได้ การได้คุยกับเธอในครั้งนี้ทำให้เราได้เข้าใจมากขึ้น ว่าหากเราได้คนคนนี้เข้ามาในชีวิต มันคงวิเศษมากขนาดไหน เรารู้สึกดีมาก ๆ จนในวันนั้นเราเองก็กลัวด้วยว่า หากเราทำไม่ดี เราคงเสียเธอไป และเป็นการสูญเสียที่เราเสียดายมาก ๆ ในชีวิต</p>
+  </div>
+</section>
+
+<!-- ===== เมาครั้งแรก (valley) ===== -->
+<section aria-label="เมาด้วยกันครั้งแรก" data-bg="#2b2320" data-dark="1">
+  <div class="wrap story">
+    <p class="eyebrow reveal" style="color:#E8A598">เมาด้วยกันครั้งแรก</p>
+    <p class="reveal d1" style="color:#e7dcd4">นี่เป็นครั้งแรกที่เราได้เห็นอีกด้านหนึ่งของเธอ และความจริงที่เธอเล่าให้ฟัง ยอมรับเลยว่าเราทำใจยอมรับเรื่องนี้อยู่นาน แต่สิ่งหนึ่งที่ทำให้เราตัดสินใจไปต่อ (จนถึงตอนนี้) คือความเข้าใจและเชื่อใจเธอ ว่าเธอจะรักเราเหมือนที่เรารักเธอ และการเมาครั้งนั้น ก็เป็นครั้งแรก ที่ทำให้เราได้เข้าใจเธอ ว่าเธอบอบบางและสมควรได้รับความรักที่ดี</p>
+  </div>
+</section>
+
+<!-- ===== โชคชะตา ===== -->
+<section aria-label="โชคชะตาตรงกันอย่างบอกไม่ถูก">
+  <div class="wrap">
+    <p class="eyebrow reveal">โชคชะตาตรงกันอย่างบอกไม่ถูก</p>
+    <div class="fate-grid reveal d1" id="fateGrid" role="group" aria-label="แตะจับคู่ความบังเอิญ">
+      <div class="chip" data-pair="1">🎂 วันเกิดของเธอ</div>
+      <div class="chip" data-pair="1">🔑 เลขห้องของเรา</div>
+      <div class="chip" data-pair="2">🏢 บริษัทของเธอ</div>
+      <div class="chip" data-pair="2">👀 ระยะที่สายตามองเห็น</div>
+    </div>
+    <p class="prompt reveal d1" id="fatePrompt" style="text-align:center">แตะสิ่งที่เข้าคู่กัน…</p>
+    <div class="story reveal" id="fateStory" style="display:none">
+      <p>ทั้งวันเกิดที่ตรงกับเลขห้อง ทั้งบริษัทของเธอที่มาอยู่ใกล้ ๆ ห้องเรา ในระดับที่สายตาสามารถมองเห็นได้ ความเข้ากันอย่างบอกไม่ถูก จังหวะหลากหลายอย่างเวลาที่เราได้คบกัน มันเข้ากัน มันพอดี จนทำให้รู้สึกได้เลยว่า “โลกอยากให้เราได้คบกัน”</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== เฌอเฌอ + เพลงอาย ===== -->
+<section id="music" aria-label="ไปต่างจังหวัดด้วยกันครั้งแรก">
+  <div class="wrap story">
+    <p class="eyebrow reveal">ไปต่างจังหวัดด้วยกันครั้งแรก</p>
+    <div class="pilewrap reveal d1">
+      <div class="pile" data-imgs="images/trip/r1.jpg,images/trip/r2.jpg,images/trip/r3.jpg,images/trip/r4.jpg,images/trip/r5.jpg" aria-label="รูปทริปต่างจังหวัดครั้งแรก"></div>
+      <p class="pile-hint">🖐️ ลากดูรูป · ดับเบิลคลิกเพื่อขยาย</p>
+    </div>
+    <p class="reveal d2">เราไปที่ร้าน “เฌอเฌอ” คุยเรื่องความสัมพันธ์ของเรา ใจของเราคิดเหมือนกันเรื่องความพร้อม แม้ว่าก่อนหน้าที่เราจะพูดประโยคนั้น ร้านจะเปิดแต่เพลงเศร้า แต่เมื่อเราได้พูดประโยคนั้น หลังจากนั้น เพลงที่ร้านก็มีแต่เพลงรัก โดยเฉพาะ “อาย” ของสิงโตนำโชค ที่เป็นตัวแทนของความอายของเราทั้งคู่ตอนที่เราจะคบกัน</p>
+    <p class="lyric reveal d3">♪ เพลง “อาย” — สิงโต นำโชค ♪</p>
+    <div class="reveal d3" style="text-align:center"><button class="btn ghost" id="playSong" type="button">🎵 แตะเพื่อฟังเพลง “อาย”</button></div>
+  </div>
+</section>
+
+<!-- ===== ช็อตตอนขอเป็นแฟน (เพลงอายเล่นตรงนี้) ===== -->
+<section id="propose" aria-label="ช็อตตอนขอเป็นแฟน" data-song="1">
+  <div class="wrap">
+    <p class="eyebrow reveal" style="text-align:center">ช็อตสำคัญของวันนั้น</p>
+    <p class="propose-line reveal d1">และในทริปครั้งนั้นเอง…<br />เราก็เอ่ยปากขอเธอเป็นแฟน 💍</p>
+    <div class="pilewrap reveal d2">
+      <div class="pile" data-imgs="images/propose/p1.jpg,images/propose/p2.jpg,images/propose/p3.jpg,images/propose/p4.jpg" aria-label="รูปช็อตตอนขอเป็นแฟน"></div>
+      <p class="pile-hint">🖐️ ลากดูรูป · ดับเบิลคลิกเพื่อขยาย</p>
+    </div>
+    <p class="lyric reveal d3">♪ แล้วเพลง “อาย” ก็ดังขึ้นพอดี ♪</p>
+  </div>
+</section>
+
+<!-- ===== วางแผนชีวิต ===== -->
+<section aria-label="แฟนคนแรกที่มานั่งวางแผนชีวิตด้วยกัน">
+  <div class="wrap story">
+    <p class="eyebrow reveal">แฟนคนแรกที่มานั่งวางแผนชีวิตด้วยกัน</p>
+    <p class="reveal d2">และแม้เรายังคบกันได้ไม่นาน แต่เธอก็คนแรกที่เราได้นั่งวางแผนชีวิตอย่างจริงจังด้วย และคิดว่าเป็นคนคนเดียวที่สามารถคุยได้ในระดับนี้ นั้นเลยทำให้เราเห็นและมองว่าเธอเป็นคนที่ใช่ ไม่ใช่เพราะความสวย (ถึงแม้ว่าเธอจะสวยมาก ๆ อยู่แล้วก็เถอะ) แต่ว่ามันเป็นเพราะสิ่งที่เธอเป็น ความมี logic ใจที่นิ่ง เข้าใจการจัดการปัญหา การบริหารจัดการความรู้สึกของตัวเอง วิธีคิดของเรากับเธอที่เหมือนกัน เคมีที่เข้ากัน มองอะไรเหมือนกัน คิดอะไรเหมือนกัน คุยกันง่าย ทำความเข้าใจกันดี คบกับเธอแล้วเหมือนมีคนมาแกะสลักให้เราเป็นคนที่รักตัวเองมากขึ้นอยู่ตลอดเวลา</p>
+  </div>
+</section>
+
+<!-- ===== ความทรงจำของเรา (กอง ๆ รูป) ===== -->
+<section id="memories" aria-label="ความทรงจำของเรา">
+  <div class="wrap">
+    <p class="eyebrow reveal" style="text-align:center">ความทรงจำของเรา</p>
+    <h2 class="reveal d1" style="text-align:center">อีกหลายโมเมนต์เล็ก ๆ ที่เราเก็บไว้ด้วยกัน</h2>
+    <div class="pilewrap reveal d2">
+      <div class="pile" data-imgs="images/memories/m1.jpg,images/memories/m2.jpg,images/memories/m3.jpg,images/memories/m4.jpg,images/memories/m5.jpg,images/memories/m6.jpg,images/memories/m7.jpg,images/memories/m8.jpg,images/memories/m9.jpg,images/memories/m10.jpg,images/memories/m11.jpg,images/memories/m12.jpg" aria-label="กองรูปความทรงจำของเรา"></div>
+      <p class="pile-hint">🖐️ ลากหยิบดูทีละรูป · ดับเบิลคลิกเพื่อขยาย</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ขอบคุณ ===== -->
+<section id="thanks" aria-label="ขอบคุณ" data-bg="#FBEFE6">
+  <div class="wrap story">
+    <p class="eyebrow reveal">ขอบคุณ</p>
+    <p class="reveal d1">ขอบคุณที่อยู่ด้วยกัน แม้จะเป็นระยะเวลาสั้น ๆ แต่เราเชื่อว่าการเดินทางของเรากับเธอในครั้งนี้จะเป็นการเดินทางที่ยาวนานร่วมกัน อาจจะไม่ได้สดใสทั้งหมด แต่เราเชื่อว่าวิธีที่เราจัดการสิ่งต่าง ๆ ร่วมกัน เราจะสู้กับปัญหา ไม่ใช่สู้กันเอง นั้นเลยทำให้เธอเป็น No.1 ของคนที่เราอยากใช้ชีวิตด้วยมากกว่าใคร</p>
+    <p class="key reveal d2">“รักเสมอ แม้ว่าจะพูดบ่อยแล้ว แค่อยากให้รู้ว่ารักจริง ๆ”</p>
+  </div>
+</section>
+
+<!-- ===== อนาคต (ก๊องเขียนเพิ่มตรงนี้) ===== -->
+<section aria-label="หลังจากนี้เราอยากอยู่ด้วยกันแบบไหน" data-bg="#FBEFE6">
+  <div class="wrap story">
+    <p class="eyebrow reveal">หลังจากนี้… เราอยากอยู่ด้วยกันแบบไหน</p>
+    <p class="reveal d1" id="futureText">หลังจากนี้ คงมีอะไรมากมายที่เราต้องเจอร่วมกัน คงมีเรื่องดี ๆ แบบนับไม่ครบเลยล่ะ แต่ว่าเรื่องแย่ ๆ บางครั้งก็อาจจะเกิดขึ้นได้ สิ่งที่เราอยากขอ มีแค่สื่อสารกัน มีอะไรเราแค่คุยกันเรื่อย ๆ แค่นี้เราเชื่อว่า เราก็จะสามารถอยู่ด้วยกันได้อย่างมีความสุขแล้วล่ะ และขอขอบคุณมาก ๆ ที่เธอสื่อสารกับเราตลอด ๆ เสมอมาและอยากให้เป็นแบบนั้นต่อไป เราเองก็จะสื่อสารเสมอ ๆ นะคับ จุ๊บ ๆ</p>
+  </div>
+</section>
+
+<!-- ===== FINALE ===== -->
+<section id="finale" aria-label="แต่งงานกันนะ" data-bg="#F7E9D6">
+  <div class="wrap">
+    <p class="key reveal" style="margin-bottom:26px">โลกจับเราสองคนมาเจอกัน… ก็เพื่อสิ่งนี้</p>
+    <div class="cert reveal d1">
+      <p class="eyebrow" style="text-align:center">คำสัญญาของเรา</p>
+      <h2>แต่งงานกันนะ</h2>
+      <p style="text-align:center">แม้ว่าจะยังไม่ได้แต่งจริง ๆ แต่เราก็แต่งกันทางความคิดไปก่อน เดี๋ยวเก็บเงินมาแต่งจริง</p>
+      <div class="sign-wrap">
+        <p class="sign-label">ลงนามทั้งสองฝ่าย เหมือนใบทะเบียนสมรส</p>
+        <div class="sign-grid">
+          <div class="sign-col">
+            <canvas id="pad1" class="pad" aria-label="ลายเซ็นว่าที่เจ้าบ่าว"></canvas>
+            <p class="sign-name">ว่าที่เจ้าบ่าว 💙</p>
+          </div>
+          <div class="sign-col">
+            <canvas id="pad2" class="pad" aria-label="ลายเซ็นว่าที่เจ้าสาว"></canvas>
+            <p class="sign-name">ว่าที่เจ้าสาว 💗</p>
+          </div>
+        </div>
+      </div>
+      <div class="sign-actions">
+        <button class="btn ghost" id="clearSign" type="button">ลบ แล้วเซ็นใหม่</button>
+        <button class="btn" id="doSign" type="button" disabled>ลงนามกันนะ 💍</button>
+      </div>
+      <p class="wife-reveal" id="wifeReveal" aria-live="polite"></p>
+      <p class="done-msg" id="doneMsg">— รักเสมอ —</p>
+      <div id="dlWrap"><button class="btn ghost" id="dlBtn" type="button">เก็บใบสัญญาของเราไว้ 📜</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== lightbox ขยายรูป ===== -->
+<div id="lightbox" role="dialog" aria-label="ดูรูปขยาย" aria-modal="true">
+  <button class="lb-close" type="button" aria-label="ปิด">✕</button>
+  <button class="lb-btn lb-prev" type="button" aria-label="รูปก่อนหน้า">‹</button>
+  <div class="lb-frame"><img alt="รูปความทรงจำ" /></div>
+  <button class="lb-btn lb-next" type="button" aria-label="รูปถัดไป">›</button>
+  <div class="lb-count"></div>
+</div>
+
+<div id="ytHost" aria-hidden="true"><div id="ytPlayer"></div></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ====== ตั้งค่าได้ตรงนี้ ====== */
+  var HER_NAME = "คุณแฟน";   // ← คำเรียกแฟนบนหน้าเปิด (เปลี่ยนเป็นชื่อเล่นก็ได้)
+  var WIFE_NAME = "คุณภรรยา"; // ← พอเซ็นแต่งงานเสร็จจะเปลี่ยนมาเรียกแบบนี้
+  /* ============================= */
+
+  document.getElementById("herName").textContent = HER_NAME;
+  document.title = "ถึง" + HER_NAME;
+
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var svgns = "http://www.w3.org/2000/svg";
+  function buzz(p){ if(navigator.vibrate){ try{ navigator.vibrate(p); }catch(e){} } }
+
+  /* ---- lazy images ---- */
+  document.querySelectorAll("figure img[data-src]").forEach(function(img){
+    var src = img.getAttribute("data-src");
+    var probe = new Image();
+    probe.onload = function(){ img.src = src; img.parentElement.classList.add("has-img"); scheduleThread(); };
+    probe.src = src;
+  });
+
+  /* ---- memory stamps: ไอคอนประจำแต่ละสถานที่ ---- */
+  var ICONS = {
+    spark:'<circle cx="8" cy="12" r="2.4"/><circle cx="16" cy="12" r="2.4"/><path d="M10.6 12h2.8"/>',
+    chat:'<path d="M4 5h16v10H9l-4 3v-3H4z"/><circle cx="9" cy="10" r=".6"/><circle cx="12" cy="10" r=".6"/><circle cx="15" cy="10" r=".6"/>',
+    coffee:'<path d="M5 8h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 9h2a2 2 0 0 1 0 4h-2"/><path d="M8 3v2M11 3v2"/>',
+    meal:'<path d="M6 3v18M5 3v5a2 2 0 0 0 3 0V3"/><path d="M17 3c-2 0-3 2-3 5s1 4 3 4v9"/>',
+    lamp:'<path d="M12 21V9"/><path d="M8 9a4 4 0 0 1 8 0z"/><path d="M9.5 21h5"/>',
+    hotpot:'<path d="M3 10h18"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M9 6c0-1 1-1 1-2M14 6c0-1 1-1 1-2"/><path d="M2.5 10H4M20 10h1.5"/>',
+    bowl:'<path d="M4 11h16a8 8 0 0 1-16 0z"/><path d="M9 7c0-1 1-1 1-2M14 7c0-1 1-1 1-2"/>',
+    wine:'<path d="M8 3h8l-1.5 6a2.5 2.5 0 0 1-5 0z"/><path d="M12 15v5M9 20h6"/>',
+    star:'<path d="M12 4l1.6 4.2L18 9l-3.4 2.6L16 16l-4-2.6L8 16l1.4-4.4L6 9l4.4-.8z"/>',
+    music:'<path d="M9 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM9 17V6l10-2v9"/><path d="M19 13a2 2 0 1 1-4 0 2 2 0 0 1 4 0z"/>',
+    map:'<circle cx="12" cy="12" r="8"/><path d="M14.5 9.5l-2 4-4 2 2-4z"/>',
+    heart:'<path d="M12 20s-7-4.5-7-9a3.8 3.8 0 0 1 7-2.2A3.8 3.8 0 0 1 19 11c0 4.5-7 9-7 9z"/>',
+    house:'<path d="M4 11l8-6 8 6"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/>',
+    ring:'<circle cx="12" cy="14" r="5"/><path d="M9.5 8.5L11 5h2l1.5 3.5"/>',
+    camera:'<path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.2"/>'
+  };
+  // เรียงตามลำดับ section: intro, โต๊ะ, กาแฟ, กินข้าว, บรรทัดทอง, peak, ถ้วยถัง, เมา, โชคชะตา, เฌอเฌอ, ขอเป็นแฟน, วางแผน, ความทรงจำ, ขอบคุณ, อนาคต, finale
+  var STAMP_ORDER = ["spark","chat","coffee","meal","lamp","hotpot","bowl","wine","star","music","heart","map","camera","heart","house","ring"];
+  document.querySelectorAll("section").forEach(function(sec, i){
+    var key = STAMP_ORDER[i]; if(!key) return;
+    var wrap = sec.querySelector(".wrap"); if(!wrap) return;
+    var d = document.createElement("div"); d.className = "stamp reveal"; d.setAttribute("aria-hidden","true");
+    d.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+ICONS[key]+'</svg>';
+    wrap.insertBefore(d, wrap.firstChild);
+  });
+
+  /* ---- reveal on scroll ---- */
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
+  }, { threshold: 0.18 });
+  document.querySelectorAll(".reveal").forEach(function(el){ io.observe(el); });
+
+  /* ---- background warmth + song trigger ---- */
+  var sections = Array.prototype.slice.call(document.querySelectorAll("section"));
+  var bgIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting && e.intersectionRatio > 0.5){
+        var bg = e.target.getAttribute("data-bg");
+        document.body.style.background = bg || "#FAF6F0";
+        if(e.target.getAttribute("data-song")) tryPlaySong();
+      }
+    });
+  }, { threshold: [0.5] });
+  sections.forEach(function(s){ bgIO.observe(s); });
+
+  /* ---- LIGHTBOX (ดับเบิลคลิกขยายรูป) ---- */
+  var LB = (function(){
+    var el = document.getElementById("lightbox");
+    var imgEl = el.querySelector(".lb-frame img");
+    var countEl = el.querySelector(".lb-count");
+    var list = [], idx = 0;
+    function render(){ imgEl.src = list[idx]; countEl.textContent = (idx+1)+" / "+list.length; }
+    function open(l, i){ list = l.slice(); idx = i||0; render(); el.classList.add("on"); document.body.style.overflow = "hidden"; }
+    function close(){ el.classList.remove("on"); document.body.style.overflow = ""; imgEl.removeAttribute("src"); }
+    function step(d){ idx = (idx + d + list.length) % list.length; render(); }
+    el.querySelector(".lb-close").addEventListener("click", close);
+    el.querySelector(".lb-prev").addEventListener("click", function(e){ e.stopPropagation(); step(-1); });
+    el.querySelector(".lb-next").addEventListener("click", function(e){ e.stopPropagation(); step(1); });
+    el.addEventListener("click", function(e){ if(e.target === el || e.target.className === "lb-frame") close(); });
+    document.addEventListener("keydown", function(e){ if(!el.classList.contains("on")) return;
+      if(e.key === "Escape") close(); else if(e.key === "ArrowLeft") step(-1); else if(e.key === "ArrowRight") step(1); });
+    var sx = 0;
+    imgEl.addEventListener("touchstart", function(e){ sx = e.touches[0].clientX; }, { passive: true });
+    imgEl.addEventListener("touchend", function(e){ var dx = e.changedTouches[0].clientX - sx; if(Math.abs(dx) > 40) step(dx < 0 ? 1 : -1); }, { passive: true });
+    return { open: open };
+  })();
+
+  /* ---- PHOTO PILE (กอง ๆ รูปบนโต๊ะ) ---- */
+  function buildPile(pileEl){
+    var imgs = pileEl.getAttribute("data-imgs").split(",");
+    var caps = (pileEl.getAttribute("data-caps") || "").split("|");
+    var topZ = imgs.length;
+    imgs.forEach(function(src, i){
+      var card = document.createElement("div"); card.className = "polaroid";
+      card._rot = ((i * 37) % 25) - 12;   // เอียงคงที่ -12..12 องศา
+      card._ox = ((i * 53) % 44) - 22;    // เยื้องกอง -22..22 px
+      card._oy = ((i * 29) % 40) - 20;
+      card.style.zIndex = i + 1;
+      apply(card, 0, 0);
+      var img = document.createElement("img"); img.alt = ""; img.src = src;
+      img.onload = function(){ if(img.naturalWidth > img.naturalHeight) card.classList.add("land"); scheduleThread(); };
+      card.appendChild(img);
+      if(caps[i]){ var cap = document.createElement("div"); cap.className = "cap"; cap.textContent = caps[i]; card.appendChild(cap); }
+      var dragging = false, moved = false, sx = 0, sy = 0, dx = 0, dy = 0, lastTap = 0;
+      card.addEventListener("pointerdown", function(ev){
+        dragging = true; moved = false; sx = ev.clientX; sy = ev.clientY;
+        topZ++; card.style.zIndex = topZ;
+        try { card.setPointerCapture(ev.pointerId); } catch(e){}
+      });
+      card.addEventListener("pointermove", function(ev){
+        if(!dragging) return; dx = ev.clientX - sx; dy = ev.clientY - sy;
+        if(Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true; apply(card, dx, dy);
+      });
+      card.addEventListener("pointerup", function(){
+        if(!dragging) return; dragging = false;
+        card._ox += dx; card._oy += dy; dx = 0; dy = 0; apply(card, 0, 0);
+        if(!moved){ var now = Date.now(); if(now - lastTap < 320){ LB.open(imgs, i); lastTap = 0; } else { lastTap = now; } }
+      });
+      card.addEventListener("dblclick", function(){ LB.open(imgs, i); });
+      pileEl.appendChild(card);
+    });
+    function apply(c, ddx, ddy){
+      c.style.transform = "translate(-50%,-50%) translate(" + (c._ox + ddx) + "px," + (c._oy + ddy) + "px) rotate(" + c._rot + "deg)";
+    }
+  }
+  var pileIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ buildPile(e.target); pileIO.unobserve(e.target); } });
+  }, { rootMargin: "300px 0px" });
+  document.querySelectorAll(".pile[data-imgs]").forEach(function(p){ pileIO.observe(p); });
+
+  /* ---- PLACE CARD: รูปร้าน + แผนที่ (lazy) ---- */
+  function loadPlace(el){
+    var q = el.getAttribute("data-q") || el.getAttribute("data-name") || "";
+    var photo = el.getAttribute("data-photo");
+    if(photo){
+      var pimg = el.querySelector(".place-photo img");
+      var probe = new Image();
+      probe.onload = function(){ pimg.src = photo; pimg.parentElement.classList.add("has-img"); };
+      probe.src = photo;
+    }
+    var mapBox = el.querySelector(".place-map");
+    if(mapBox){
+      var ifr = document.createElement("iframe");
+      ifr.setAttribute("loading", "lazy");
+      ifr.setAttribute("referrerpolicy", "no-referrer-when-downgrade");
+      ifr.title = "แผนที่ " + (el.getAttribute("data-name") || q);
+      ifr.src = "https://maps.google.com/maps?q=" + encodeURIComponent(q) + "&z=16&output=embed";
+      mapBox.innerHTML = ""; mapBox.appendChild(ifr);
+    }
+    var link = el.querySelector("[data-maplink]");
+    if(link){ link.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q); }
+  }
+  var placeIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ loadPlace(e.target); placeIO.unobserve(e.target); } });
+  }, { rootMargin: "400px 0px" });
+  document.querySelectorAll("[data-place]").forEach(function(el){ placeIO.observe(el); });
+
+  /* ---- RED THREAD OF FATE ---- */
+  var svg = document.getElementById("thread");
+  var threadPath = document.getElementById("threadPath");
+  var beadsG = document.getElementById("beads");
+  var knot = document.getElementById("knot");
+  var startY = 130, cx, amp, endY, wl = 520;
+  var threadTimer = null;
+  function scheduleThread(){ clearTimeout(threadTimer); threadTimer = setTimeout(buildThread, 120); }
+  function buildThread(){
+    var W = window.innerWidth;
+    var H = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    svg.setAttribute("width", W); svg.setAttribute("height", H); svg.setAttribute("viewBox", "0 0 "+W+" "+H);
+    cx = W*0.5; amp = Math.min(64, W*0.12); endY = H - 220;
+    var d = "M "+cx+" "+startY;
+    for(var y=startY; y<=endY; y+=30){ d += " L "+(cx + amp*Math.sin((y-startY)/wl*Math.PI*2)).toFixed(1)+" "+y; }
+    threadPath.setAttribute("d", d);
+    var len = threadPath.getTotalLength();
+    threadPath.style.strokeDasharray = len; threadPath._len = len;
+    beadsG.innerHTML = "";
+    sections.forEach(function(sec){
+      var y = sec.offsetTop + Math.min(sec.offsetHeight*0.5, 150);
+      if(y < startY || y > endY) return;
+      var c = document.createElementNS(svgns, "circle");
+      c.setAttribute("cx", (cx + amp*Math.sin((y-startY)/wl*Math.PI*2)).toFixed(1));
+      c.setAttribute("cy", y); c.setAttribute("r", 4); c.setAttribute("class", "bead"); c._y = y;
+      beadsG.appendChild(c);
+    });
+    knot.setAttribute("cx", cx); knot.setAttribute("cy", endY);
+    updateThread();
+  }
+  function updateThread(){
+    if(!threadPath._len) return;
+    var docH = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    var scrolled = window.scrollY + window.innerHeight*0.62;
+    var frac = Math.max(0, Math.min(1, (scrolled - startY)/(endY - startY)));
+    threadPath.style.strokeDashoffset = threadPath._len * (1 - frac);
+    var beads = beadsG.childNodes;
+    for(var i=0;i<beads.length;i++){ if(scrolled > beads[i]._y) beads[i].classList.add("lit"); }
+    if(frac > 0.98) knot.classList.add("lit");
+  }
+  window.addEventListener("resize", scheduleThread);
+  if(document.fonts && document.fonts.ready){ document.fonts.ready.then(scheduleThread); }
+
+  /* ---- scroll handler (bar + thread) ---- */
+  var bar = document.getElementById("bar");
+  window.addEventListener("scroll", function(){
+    var h = document.documentElement;
+    bar.style.width = (h.scrollTop/(h.scrollHeight - h.clientHeight)*100) + "%";
+    updateThread();
+  }, { passive: true });
+
+  /* ---- THRESHOLD + เพลง "อาย" (YouTube) ---- */
+  // เพลง "อาย" - สิงโต นำโชค หลายเวอร์ชัน (เผื่อบางอันปิดการฝัง จะไล่ลองอันถัดไปเอง)
+  var YT_IDS = ["SjEQrlpshSw", "8-nCKJ52pSY", "TDBUa1hvD1k", "JlS-HQFZ5pA"];
+  var ytIdx = 0;
+  var soundBtn = document.getElementById("sound");
+  var soundOn = false, songReached = false, ytReady = false, pendingPlay = false, ytPlayer = null;
+  var enterEl = document.getElementById("enter");
+
+  (function(){ var s = document.createElement("script"); s.src = "https://www.youtube.com/iframe_api"; document.head.appendChild(s); })();
+  window.onYouTubeIframeAPIReady = function(){
+    ytPlayer = new YT.Player("ytPlayer", {
+      videoId: YT_IDS[0],
+      playerVars: { autoplay: 0, controls: 0, playsinline: 1, rel: 0, modestbranding: 1 },
+      events: {
+        onReady: function(){ ytReady = true; if(pendingPlay) startSong(); },
+        onError: function(){ ytIdx++; if(ytIdx < YT_IDS.length && ytPlayer){
+          try { ytPlayer.loadVideoById(YT_IDS[ytIdx]); ytPlayer.unMute(); ytPlayer.playVideo(); } catch(e){} } }
+      }
+    });
+  };
+  function startSong(){ if(!ytPlayer || !ytReady){ pendingPlay = true; return; }
+    try { ytPlayer.unMute(); ytPlayer.setVolume(65); ytPlayer.playVideo(); } catch(e){} }
+  function stopSong(){ if(ytPlayer && ytReady){ try { ytPlayer.pauseVideo(); } catch(e){} } }
+  function tryPlaySong(){ songReached = true; if(soundOn) startSong(); }
+
+  document.getElementById("enterBtn").addEventListener("click", function(){
+    soundOn = true; soundBtn.textContent = "🔊";
+    enterEl.classList.add("gone"); document.body.classList.remove("locked"); buzz(15);
+    setTimeout(function(){ enterEl.style.display = "none"; buildThread(); }, 1100);
+  });
+  soundBtn.addEventListener("click", function(){
+    soundOn = !soundOn; soundBtn.textContent = soundOn ? "🔊" : "🔈";
+    if(!soundOn){ stopSong(); } else if(songReached){ startSong(); }
+  });
+  // ปุ่มเล่นเพลงในฉากเฌอเฌอ — กด = gesture ตรง ทำให้เล่นได้ชัวร์บน iPhone
+  document.getElementById("playSong").addEventListener("click", function(){
+    soundOn = true; soundBtn.textContent = "🔊"; startSong();
+    this.textContent = "♪ กำลังเล่นเพลงของเรา…";
+  });
+
+  /* ---- INTRO: drag two dots ---- */
+  (function(){
+    var stage = document.getElementById("stage"), a = document.getElementById("dotA"), b = document.getElementById("dotB");
+    var story = document.getElementById("introStory"), prompt = document.getElementById("introPrompt");
+    var dragging = null, done = false;
+    function pt(ev){ return ev.touches ? ev.touches[0] : ev; }
+    function setPos(dot, x){ var r = stage.getBoundingClientRect();
+      dot.style.left = Math.max(6, Math.min(94, ((x - r.left)/r.width)*100)) + "%"; }
+    function check(){ if(Math.abs(parseFloat(a.style.left||22) - parseFloat(b.style.left||78)) < 12 && !done) merge(); }
+    function merge(){ done = true; a.style.left = "50%"; b.style.left = "50%"; stage.classList.add("merged");
+      prompt.style.display = "none"; story.style.display = "block"; buzz(20);
+      requestAnimationFrame(function(){ story.classList.add("in"); }); scheduleThread(); }
+    function down(dot){ return function(ev){ if(done) return; dragging = dot; ev.preventDefault(); }; }
+    function move(ev){ if(!dragging) return; setPos(dragging, pt(ev).clientX); check(); }
+    function up(){ dragging = null; }
+    a.addEventListener("mousedown", down(a)); b.addEventListener("mousedown", down(b));
+    a.addEventListener("touchstart", down(a), {passive:false}); b.addEventListener("touchstart", down(b), {passive:false});
+    window.addEventListener("mousemove", move); window.addEventListener("touchmove", move, {passive:false});
+    window.addEventListener("mouseup", up); window.addEventListener("touchend", up);
+    [a,b].forEach(function(d){ d.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); merge(); } }); });
+    if(reduce){ prompt.textContent = "แตะที่แสงเพื่อเริ่มเรื่องของเรา"; a.addEventListener("click", merge); b.addEventListener("click", merge); }
+  })();
+
+  /* ---- PEAK: pork into pot ---- */
+  (function(){
+    var pork = document.getElementById("pork"), pot = document.getElementById("pot"), play = document.getElementById("play");
+    var story = document.getElementById("peakStory"), prompt = document.getElementById("peakPrompt"), blush = document.getElementById("blush");
+    var dragging = false, done = false;
+    function pt(ev){ return ev.touches ? ev.touches[0] : ev; }
+    function trigger(){ if(done) return; done = true; buzz(30);
+      pork.style.transition = "opacity .5s ease, transform .5s ease"; pork.style.opacity = "0"; pork.style.transform = "translateX(-50%) scale(.4)";
+      blush.classList.add("on"); hearts(); prompt.style.display = "none"; story.style.display = "block";
+      requestAnimationFrame(function(){ story.classList.add("in"); }); scheduleThread();
+      setTimeout(function(){ blush.classList.remove("on"); }, 3200); }
+    function hearts(){ if(reduce) return;
+      for(var i=0;i<14;i++){ (function(i){ setTimeout(function(){
+        var h = document.createElement("div"); h.className="heart"; h.textContent = ["💗","💕","🩷","💞"][i%4];
+        h.style.left = (10+Math.random()*80)+"vw"; document.body.appendChild(h);
+        var dur = 2600+Math.random()*1400;
+        h.animate([{transform:"translateY(0) scale(.6)",opacity:0},{opacity:1,offset:.15},{transform:"translateY(-88vh) scale(1.1)",opacity:0}],{duration:dur,easing:"ease-out"});
+        setTimeout(function(){ h.remove(); }, dur); }, i*90); })(i); } }
+    function onPotHit(x,y){ var r = pot.getBoundingClientRect(); return x>r.left-30 && x<r.right+30 && y>r.top-30 && y<r.bottom+30; }
+    pork.addEventListener("mousedown", function(ev){ dragging=true; ev.preventDefault(); });
+    pork.addEventListener("touchstart", function(ev){ dragging=true; ev.preventDefault(); }, {passive:false});
+    function move(ev){ if(!dragging||done) return; var p = pt(ev), r = play.getBoundingClientRect();
+      pork.style.left = ((p.clientX - r.left)/r.width*100)+"%"; pork.style.top = ((p.clientY - r.top)/r.height*100)+"%";
+      if(onPotHit(p.clientX, p.clientY)) trigger(); }
+    window.addEventListener("mousemove", move); window.addEventListener("touchmove", move, {passive:false});
+    window.addEventListener("mouseup", function(){ dragging=false; }); window.addEventListener("touchend", function(){ dragging=false; });
+    pork.addEventListener("click", function(){ if(!dragging) trigger(); });
+    pork.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); trigger(); } });
+    if(reduce){ prompt.textContent = "แตะหมูคุโรบูตะเพื่อใส่หม้อ 🥢"; }
+  })();
+
+  /* ---- FATE ---- */
+  (function(){
+    var grid = document.getElementById("fateGrid"), story = document.getElementById("fateStory"), prompt = document.getElementById("fatePrompt");
+    var selected = null, matched = 0;
+    grid.querySelectorAll(".chip").forEach(function(chip){
+      chip.addEventListener("click", function(){
+        if(chip.classList.contains("matched")) return;
+        if(!selected){ selected = chip; chip.style.borderColor = "var(--accent-deep)"; return; }
+        if(selected === chip){ selected=null; chip.style.borderColor=""; return; }
+        if(selected.dataset.pair === chip.dataset.pair){
+          selected.classList.add("matched"); chip.classList.add("matched"); matched++; selected=null; buzz(12);
+          if(matched===2){ prompt.style.display="none"; story.style.display="block"; requestAnimationFrame(function(){ story.classList.add("in"); }); scheduleThread(); }
+        } else { selected.style.borderColor=""; selected = chip; chip.style.borderColor="var(--accent-deep)"; }
+      });
+    });
+  })();
+
+  /* ---- FINALE: สองลายเซ็น + ใบสัญญา ---- */
+  (function(){
+    var doSign = document.getElementById("doSign"), clearBtn = document.getElementById("clearSign");
+    var doneMsg = document.getElementById("doneMsg"), dlWrap = document.getElementById("dlWrap"), dlBtn = document.getElementById("dlBtn");
+    var wifeReveal = document.getElementById("wifeReveal");
+    var signed = false, p1, p2;
+    function updateBtn(){ if(!signed) doSign.disabled = !(p1.hasInk() && p2.hasInk()); }
+    function initPad(cv){
+      var ctx, drawing=false, ink=false, dpr=window.devicePixelRatio||1;
+      function fit(){ var r=cv.getBoundingClientRect(); cv.width=r.width*dpr; cv.height=r.height*dpr;
+        ctx=cv.getContext("2d"); ctx.scale(dpr,dpr); ctx.lineWidth=2.2; ctx.lineCap="round"; ctx.lineJoin="round"; ctx.strokeStyle="#3D3430"; }
+      fit(); window.addEventListener("resize", fit);
+      function pos(ev){ var r=cv.getBoundingClientRect(), p=ev.touches?ev.touches[0]:ev; return {x:p.clientX-r.left,y:p.clientY-r.top}; }
+      function start(ev){ if(signed) return; drawing=true; var p=pos(ev); ctx.beginPath(); ctx.moveTo(p.x,p.y); ev.preventDefault(); }
+      function drw(ev){ if(!drawing) return; var p=pos(ev); ctx.lineTo(p.x,p.y); ctx.stroke(); ink=true; updateBtn(); ev.preventDefault(); }
+      function end(){ drawing=false; }
+      cv.addEventListener("mousedown",start); cv.addEventListener("mousemove",drw); window.addEventListener("mouseup",end);
+      cv.addEventListener("touchstart",start,{passive:false}); cv.addEventListener("touchmove",drw,{passive:false}); cv.addEventListener("touchend",end);
+      return { clear:function(){ cv.width=cv.width; ctx=cv.getContext("2d"); ctx.scale(dpr,dpr); ctx.lineWidth=2.2; ctx.lineCap="round"; ctx.lineJoin="round"; ctx.strokeStyle="#3D3430"; ink=false; },
+               hasInk:function(){ return ink; }, canvas:cv };
+    }
+    p1 = initPad(document.getElementById("pad1"));
+    p2 = initPad(document.getElementById("pad2"));
+    clearBtn.addEventListener("click", function(){ p1.clear(); p2.clear(); if(!signed) doSign.disabled=true; });
+    doSign.addEventListener("click", function(){
+      if(signed || !(p1.hasInk() && p2.hasInk())) return; signed=true; doSign.disabled=true; doSign.textContent="ลงนามแล้ว 💍";
+      wifeReveal.innerHTML = 'จากวันนี้… “'+HER_NAME+'” ของเรา กลายเป็น “<b>'+WIFE_NAME+'</b>” แล้วนะ 💍';
+      doneMsg.textContent = "— รักเสมอ นะ "+WIFE_NAME+" —";
+      setTimeout(function(){ wifeReveal.classList.add("show"); }, 400);
+      setTimeout(function(){ doneMsg.classList.add("show"); dlWrap.classList.add("show"); }, 1200);
+      buzz([15,40,15]); petals();
+    });
+    function petals(){ if(reduce) return;
+      for(var i=0;i<32;i++){ (function(i){ setTimeout(function(){
+        var el=document.createElement("div"); el.className="petal"; el.textContent=["🌸","🌷","💗","✨","🩷"][i%5];
+        el.style.left=(Math.random()*100)+"vw"; document.body.appendChild(el);
+        var dur=4200+Math.random()*2600;
+        el.animate([{transform:"translateY(-10px) rotate(0)",opacity:0},{opacity:1,offset:.1},{transform:"translateY(105vh) rotate("+(Math.random()*360)+"deg)",opacity:.9}],{duration:dur,easing:"ease-in"});
+        setTimeout(function(){ el.remove(); }, dur); }, i*120); })(i); } }
+    dlBtn.addEventListener("click", function(){
+      var draw2 = function(){
+        var w=1000,h=760, c=document.createElement("canvas"); c.width=w; c.height=h; var x=c.getContext("2d");
+        x.fillStyle="#fffdf8"; x.fillRect(0,0,w,h);
+        x.strokeStyle="#D98A76"; x.lineWidth=3; x.strokeRect(28,28,w-56,h-56);
+        x.textAlign="center"; x.fillStyle="#D98A76"; x.font="400 22px Sarabun, sans-serif"; x.fillText("ทะเบียนสมรส (ทางใจ)", w/2, 116);
+        x.fillStyle="#3D3430"; x.font="400 60px Trirong, serif"; x.fillText("แต่งงานกันนะ", w/2, 196);
+        x.fillStyle="#6b5f57"; x.font="300 22px Sarabun, sans-serif"; x.fillText("แม้ยังไม่ได้แต่งจริง ๆ เราก็แต่งกันทางความคิดไปก่อน", w/2, 248);
+        x.drawImage(p1.canvas, 70, 300, 400, 170); x.drawImage(p2.canvas, 530, 300, 400, 170);
+        x.strokeStyle="#D98A76"; x.lineWidth=2;
+        x.beginPath(); x.moveTo(70,480); x.lineTo(470,480); x.stroke();
+        x.beginPath(); x.moveTo(530,480); x.lineTo(930,480); x.stroke();
+        x.fillStyle="#6b5f57"; x.font="300 20px Sarabun, sans-serif";
+        x.fillText("ว่าที่เจ้าบ่าว", 270, 512); x.fillText("ว่าที่เจ้าสาว", 730, 512);
+        var d=new Date(); var ds=d.getDate()+"/"+(d.getMonth()+1)+"/"+(d.getFullYear()+543);
+        x.fillText("ลงนามเมื่อ "+ds, w/2, 578);
+        x.fillStyle="#D98A76"; x.font="400 34px Trirong, serif"; x.fillText("— รักเสมอ —", w/2, 662);
+        var a=document.createElement("a"); a.download="our-promise.png"; a.href=c.toDataURL("image/png"); a.click();
+      };
+      if(document.fonts && document.fonts.ready){ document.fonts.ready.then(draw2); } else { draw2(); }
+    });
+  })();
+
+  buildThread();
+})();
+</script>
+</body>
+</html>
